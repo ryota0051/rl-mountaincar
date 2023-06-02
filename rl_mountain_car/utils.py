@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-import numpy as np
 from IPython import display
 
 
@@ -10,12 +9,26 @@ def render_env(env, title):
     display.display(plt.gcf())
 
 
-def energy(state):
-    """報酬計算に使用する(https://qiita.com/payanotty/items/07fb38a44cc3bd13e4dd 参考)。"""
-    x = state[0]  # 位置(横方向)
-    g = 0.0025  # 重力定数
-    v = state[1]  # 速度
-
-    c = 1 / (g * np.sin(3 * 0.5) + 0.5 * 0.07 * 0.07)  # 正規化定数
-
-    return c * (g * np.sin(3 * x) + 0.5 * v * v)
+def calc_reward(
+    current_state: tuple[float, float],
+    next_state: tuple[float, float],
+    num_trial: int,
+    done: bool,
+) -> int:
+    """MountainCarのデフォルト報酬が厳しすぎるので新たに定義した報酬関数
+    Args:
+        current_state: 現在の状態(位置, 速度)
+        next_state: 次の状態(位置, 速度)
+        num_trial: 試行回数
+        done: ゴールにたどり着いたか
+    Returns:
+        報酬
+    """
+    reward = -1
+    # 200回以内にdoneにたどり着いた場合は報酬に250を加算
+    if done and (num_trial < 200):
+        reward += 250
+    else:
+        # それ以外は、移動距離に比例した報酬を加算
+        reward = 5 * abs(next_state[0] - current_state[0]) + 3 * abs(current_state[1])
+    return reward
