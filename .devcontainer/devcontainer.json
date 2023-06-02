@@ -1,0 +1,10 @@
+{
+  "name": "rl_mountain_car",
+  "forwardPorts": [],
+  "dockerFile": "../Dockerfile",
+  "customizations": {
+    "vscode": {
+      "extensions": ["ms-python.python"]
+    }
+  }
+}

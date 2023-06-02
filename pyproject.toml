@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "work"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+gym = {version = "~0.26.2", extras = ["all"]}
+jupyterlab = "~4.0.1"
+ipywidgets = "~8.0.6"
+matplotlib = "~3.7.1"
+torch = {version = "~2.0.1", source = "torch_cpu"}
+
+[tool.poetry.group.dev.dependencies]
+black = "~23.3.0"
+flake8 = "~6.0.0"
+
+
+[[tool.poetry.source]]
+name = "torch_cpu"
+url = "https://download.pytorch.org/whl/cpu"
+default = false
+secondary = true
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
