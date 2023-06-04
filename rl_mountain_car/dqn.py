@@ -1,4 +1,5 @@
 import random
+from typing import Union
 
 from collections import deque
 
@@ -10,7 +11,14 @@ from torch.optim import Adam
 
 
 class Buffer:
+    """経験再生に使用する経験データ保持用のBufferクラス"""
+
     def __init__(self, buffer_size: int, batch_size: int) -> None:
+        """
+        Args:
+            buffer_size: 格納しておく経験データ数
+            batch_size: 一度に取り出すデータ数
+        """
         self.buffer = deque(maxlen=buffer_size)
         self.batch_size = batch_size
 
@@ -18,16 +26,32 @@ class Buffer:
         self,
         state: tuple[float, float],
         action: int,
-        reward: int,
+        reward: Union[int, float],
         next_state: tuple[float, float],
         done: bool,
     ):
+        """経験データをバッファに追加する
+        Args:
+            state: 現在の状態(mountain carでは、(位置, 速度))
+            action: 行動(mountain carでは、0, 1, 2)
+            reward: 報酬
+            next_state: 1ステップ後の状態
+            done: 終了したか
+        """
         self.buffer.append((state, action, reward, next_state, done))
 
     def __len__(self):
         return len(self.buffer)
 
     def get_batch(self):
+        """バッファからランダムに経験データをバッチサイズ分取り出す(ランダムにすることでデータ間の相関を減らす)。
+        Retrns:
+            state: 現在の状態 shape = (B, 2)
+            action: 行動 shape = (B, )
+            reward: 報酬 shape = (B, )
+            next_state: 1ステップ後の状態 shape = (B, 2)
+            done: 終了したか shape = (B, )
+        """
         data = random.sample(self.buffer, self.batch_size)
 
         state = torch.tensor(np.stack([x[0] for x in data]))
@@ -52,6 +76,14 @@ class QNet(nn.Module):
 
 
 class DQNAgent:
+    """DQNの学習と行動の取得を実施する。流れは下記
+    1. 学習対象のqnet, ラベルデータ生成用qnet_targetを生成
+        経験データのnext_stateをQNetに入力する際に、出力が変動しないようにするため
+    2. 行動をε-greedy法で選択(greedyの場合、行動は、Q関数(qnet)の出力の最大値とする。)
+    3. バッファに含まれた経験データからqnetの重み更新を実施
+    4. 一定の周期でqnetとqnet_targetの重みを同期させる
+    """
+
     def __init__(
         self,
         env,

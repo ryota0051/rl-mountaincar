@@ -14,7 +14,7 @@ def calc_reward(
     next_state: tuple[float, float],
     num_trial: int,
     done: bool,
-) -> int:
+) -> float:
     """MountainCarのデフォルト報酬が厳しすぎるので新たに定義した報酬関数
     Args:
         current_state: 現在の状態(位置, 速度)
