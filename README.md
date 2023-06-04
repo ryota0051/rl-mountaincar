@@ -11,3 +11,5 @@ mountain car を強化学習で play する
 3. 以下の notebook のうち、好きなものを実行
 
 - play_with_DQN.ipynb => DQN で mountain car を解いたもの
+
+- play_with_q_learning.ipynb => Q 学習(深層学習を使用しない ver) で mountain car を解いたもの
